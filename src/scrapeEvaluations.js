@@ -2,7 +2,7 @@ const { getComboboxOptions } = require("./getComboboxOptions.js");
 const { waitForAlbertResponse } = require("./waitForAlbertResponse.js");
 const { scrapeTerm } = require("./scrapeTerm.js");
 
-async function scrapeEvaluations(page) {
+async function scrapeEvaluations(page, termNumber) {
   const frame = await page.frameLocator('iframe[name="lbFrameContent"]');
 
   // get list of all terms
@@ -14,17 +14,19 @@ async function scrapeEvaluations(page) {
   // assert(!strictMode || terms.length > 0);
 
   // scrape each term
-  for (const term of terms) {
-    // select term
-    const response = waitForAlbertResponse(page);
-    await termsCombobox.selectOption(term);
-    await response;
-    const session = { page: page };
-    session.term = term;
+  // for (const term of terms) {
+  // select term
+  const term = terms[termNumber];
 
-    console.log(false, `Scraping term: ${term}`);
-    await scrapeTerm(session);
-  }
+  const response = waitForAlbertResponse(page);
+  await termsCombobox.selectOption(term);
+  await response;
+  const session = { page: page };
+  session.term = term;
+
+  console.log(false, `Scraping term: ${term}`);
+  await scrapeTerm(session);
+  // }
 }
 
 module.exports = { scrapeEvaluations };

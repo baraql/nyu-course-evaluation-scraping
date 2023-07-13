@@ -9,11 +9,14 @@ const { openEvaluations } = require("./openEvaluations.js");
 const { NYU_USERNAME, NYU_PASSWORD } = require("./secrets.js");
 // import { waitForAlbertResponse } from "./waitForAlbertResponse.js";
 
-async function main() {
+async function scraper(termNumber) {
   // Setup
-  const browser = await chromium.launchPersistentContext("./user-data", {
-    headless: false,
-  });
+  const browser = await chromium.launchPersistentContext(
+    "./user-data-many/" + termNumber + "/",
+    {
+      headless: false,
+    }
+  );
 
   // Close the initial about:blank page
   const [aboutBlankPage] = await browser.pages();
@@ -22,12 +25,22 @@ async function main() {
   const page = await browser.newPage();
   page.setDefaultTimeout(1000000);
 
-  logIntoAlbert(page, NYU_USERNAME, NYU_PASSWORD);
-  waitForAlbertResponse(page);
-  openEvaluations(page);
-  scrapeEvaluations(page);
-  // await page.waitForTimeout(10000);
-  // await browser.close();
+  await logIntoAlbert(page, NYU_USERNAME, NYU_PASSWORD);
+  await waitForAlbertResponse(page);
+  await openEvaluations(page);
+  await scrapeEvaluations(page, termNumber);
+  await page.waitForTimeout(10000);
+  await browser.close();
+}
+
+async function main() {
+  var scrapers = [];
+
+  for (let i = 0; i < 19; i++) {
+    scrapers.push(scraper(i));
+  }
+
+  await Promise.all(scrapers);
 }
 
 main();
