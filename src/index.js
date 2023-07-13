@@ -29,8 +29,8 @@ async function scraper(termNumber) {
   waitForAlbertResponse(page);
   openEvaluations(page);
   await scrapeEvaluations(page, termNumber);
-  await page.waitForTimeout(10000);
-  await browser.close();
+  // await page.waitForTimeout(10000);
+  // await browser.close();
   console.log("done");
 }
 
@@ -40,6 +40,7 @@ async function scraperShell(termNumber) {
     console.log("Starting scraper for termNumber " + termNumber);
     try {
       await scraper(termNumber);
+      console.log("Scraper #" + termNumber + " finished");
       loop = false;
     } catch {
       loop = true;

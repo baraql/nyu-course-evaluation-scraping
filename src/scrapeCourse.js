@@ -23,9 +23,11 @@ async function scrapeCourse(session) {
   //   assert(!strictMode || metadata["Class Description"] !== undefined);
   const sections = await frame.locator(".ps_box-scrollarea-row").all();
   console.log(
-    "Scraper for term #" +
+    "Scraper #" +
       session.termNumber +
       " is scraping " +
+      session.term +
+      "_" +
       session.school +
       "_" +
       session.subject +
