@@ -4,7 +4,10 @@ const assert = require("assert");
 
 const { scrapeEvaluations } = require("./scrapeEvaluations.js");
 const { waitForAlbertResponse } = require("./waitForAlbertResponse.js");
-const { getComboboxOptions } = require("./getComboboxOptions.js");
+const { logIntoAlbert } = require("./logIntoAlbert.js");
+const { openEvaluations } = require("./openEvaluations.js");
+const { NYU_USERNAME, NYU_PASSWORD } = require("./secrets.js");
+// import { waitForAlbertResponse } from "./waitForAlbertResponse.js";
 
 async function main() {
   // Setup
@@ -19,28 +22,12 @@ async function main() {
   const page = await browser.newPage();
   page.setDefaultTimeout(1000000);
 
-  logIntoAlbert(page);
+  logIntoAlbert(page, NYU_USERNAME, NYU_PASSWORD);
   waitForAlbertResponse(page);
   openEvaluations(page);
-
-  await page.waitForTimeout(10000);
-  await browser.close();
-}
-
-async function logIntoAlbert(page) {
-  await page.goto("http://albert.nyu.edu/albert_index.html");
-  await page.getByRole("link", { name: "Sign in to Albert" }).click();
-  await page.getByLabel("NetID (e.g., aqe123)").fill(NYU_USERNAME);
-  await page.getByLabel("Password").fill(NYU_PASSWORD);
-  await page.getByRole("button", { name: "Login" }).click();
-}
-
-async function openEvaluations(page) {
-  // const { page } = session;
-
-  await page
-    .getByRole("link", { name: "Evaluation Published Results" })
-    .click();
+  scrapeEvaluations(page);
+  // await page.waitForTimeout(10000);
+  // await browser.close();
 }
 
 main();

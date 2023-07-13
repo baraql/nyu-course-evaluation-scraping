@@ -1,4 +1,4 @@
-export function waitForAlbertResponse(page) {
+function waitForAlbertResponse(page) {
   // const { page } = session;
 
   const timeout = 300_000;
@@ -7,3 +7,5 @@ export function waitForAlbertResponse(page) {
     { timeout }
   );
 }
+
+module.exports = { waitForAlbertResponse };

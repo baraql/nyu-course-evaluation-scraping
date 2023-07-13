@@ -1,4 +1,4 @@
-export async function getComboboxOptions(comboboxLocator) {
+async function getComboboxOptions(comboboxLocator) {
   // wait for the combobox to become enabled
   await comboboxLocator.click({ trial: true });
 
@@ -10,6 +10,10 @@ export async function getComboboxOptions(comboboxLocator) {
       });
     });
 
+  console.log(JSON.stringify(options));
+
   // first value is always the default unselected option e.g. "XX"
-  return options.filter((option): option is string => option !== null).slice(1);
+  return options.slice(1);
 }
+
+module.exports = { getComboboxOptions };
