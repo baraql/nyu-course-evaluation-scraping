@@ -9,7 +9,7 @@ const { openEvaluations } = require("./openEvaluations.js");
 const { NYU_USERNAME, NYU_PASSWORD } = require("./secrets.js");
 // import { waitForAlbertResponse } from "./waitForAlbertResponse.js";
 
-const debugNum = 4;
+const debugNum = -1;
 
 async function scraper(termNumber) {
   // Setup

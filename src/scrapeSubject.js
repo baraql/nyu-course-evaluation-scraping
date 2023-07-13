@@ -51,8 +51,10 @@ async function scrapeSubject(session) {
     // scrape each course
     for (var i = 0; i < courses.length; i++) {
       const course = courses[i];
-      session.courseN = courses.length;
+      session.courseN = i;
       // click into evaluations page
+      // session.course =
+
       const evaluationsResponse = waitForAlbertResponse(session.page);
       await course
         .getByRole("button", { name: "Evaluation Results for" })

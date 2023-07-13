@@ -29,11 +29,10 @@ async function scrapeCourse(session) {
       session.term +
       "____" +
       session.school +
-      `(${session.schoolN}/${session.schoolT})____` +
+      `(${session.schoolN + 1}/${session.schoolT})____` +
       session.subject +
-      `(${session.subjectN}/${session.subjectT})____` +
-      session.course +
-      `(${session.courseN}/${session.courseT})____ (` +
+      `(${session.subjectN + 1}/${session.subjectT})____` +
+      `(${session.courseN + 1}/${session.courseT})____ (` +
       sections.length +
       " sections)"
   );
