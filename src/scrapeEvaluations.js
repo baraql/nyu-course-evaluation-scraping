@@ -1,4 +1,4 @@
-async function scrapeEvaluations(session) {
+export async function scrapeEvaluations(session) {
   const { page } = session;
   const frame = await page.frameLocator('iframe[name="lbFrameContent"]');
 

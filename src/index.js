@@ -2,6 +2,10 @@ const { chromium, Page, ScrapingSession, Locator } = require("playwright");
 const fs = require("fs");
 const assert = require("assert");
 
+const { scrapeEvaluations } = require("./scrapeEvaluations.js");
+const { waitForAlbertResponse } = require("./waitForAlbertResponse.js");
+const { getComboboxOptions } = require("./getComboboxOptions.js");
+
 async function main() {
   // Setup
   const browser = await chromium.launchPersistentContext("./user-data", {

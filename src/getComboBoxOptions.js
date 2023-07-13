@@ -1,4 +1,4 @@
-async function getComboboxOptions(comboboxLocator) {
+export async function getComboboxOptions(comboboxLocator) {
   // wait for the combobox to become enabled
   await comboboxLocator.click({ trial: true });
 
