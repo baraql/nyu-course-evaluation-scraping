@@ -9,12 +9,14 @@ const { openEvaluations } = require("./openEvaluations.js");
 const { NYU_USERNAME, NYU_PASSWORD } = require("./secrets.js");
 // import { waitForAlbertResponse } from "./waitForAlbertResponse.js";
 
+const debugNum = 4;
+
 async function scraper(termNumber) {
   // Setup
   const browser = await chromium.launchPersistentContext(
     "./user-data-many/" + termNumber + "/",
     {
-      headless: true,
+      headless: debugNum >= 0 ? false : true,
     }
   );
 
@@ -49,13 +51,15 @@ async function scraperShell(termNumber) {
 }
 
 async function main() {
-  var scrapers = [];
-
-  for (let i = 0; i < 19; i++) {
-    scrapers.push(scraperShell(i));
+  if (debugNum >= 0) {
+    await scraperShell(debugNum);
+  } else {
+    var scrapers = [];
+    for (let i = 0; i < 19; i++) {
+      scrapers.push(scraperShell(i));
+    }
+    await Promise.all(debugNum);
   }
-
-  await Promise.all(scrapers);
 }
 
 main();
