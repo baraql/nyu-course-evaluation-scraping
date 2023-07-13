@@ -10,7 +10,7 @@ async function getComboboxOptions(comboboxLocator) {
       });
     });
 
-  console.log(JSON.stringify(options));
+  // console.log(JSON.stringify(options));
 
   // first value is always the default unselected option e.g. "XX"
   return options.slice(1);

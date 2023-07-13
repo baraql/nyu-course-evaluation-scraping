@@ -37,7 +37,7 @@ async function scraper(termNumber) {
 async function scraperShell(termNumber) {
   var loop = false;
   do {
-    console.log("starting" + termNumber);
+    console.log("Starting scraper for termNumber " + termNumber);
     try {
       await scraper(termNumber);
       loop = false;

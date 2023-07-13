@@ -19,11 +19,21 @@ async function scrapeCourse(session) {
     metadata[label.slice(0, -1)] = value;
   }
 
-  console.log(false, `Scraping course: ${metadata["Class Description"]}`);
+  // console.log(false, `Scraping course: ${metadata["Class Description"]}`);
   //   assert(!strictMode || metadata["Class Description"] !== undefined);
-
   const sections = await frame.locator(".ps_box-scrollarea-row").all();
-  console.log(true, `${sections.length} sections of questions`);
+  console.log(
+    "Scraper for term #" +
+      session.termNumber +
+      " is scraping " +
+      session.school +
+      "_" +
+      session.subject +
+      " (" +
+      sections.length +
+      " sections)"
+  );
+  // console.log(true, `${sections.length} sections of questions`);
   for (const section of sections) {
     // some sections can be empty! e.g. Fall 2022, ENGR-UH 1000 LAB4
     if ((await section.innerHTML()) === "") continue;
@@ -46,7 +56,7 @@ async function scrapeCourse(session) {
     var questionSection = [];
 
     const questions = await section.getByRole("row").all();
-    console.log(true, `${questions.length} questions`);
+    // console.log(true, `${questions.length} questions`);
     // assert(!strictMode || questions.length > 0);
 
     for (const questionLocator of questions) {
