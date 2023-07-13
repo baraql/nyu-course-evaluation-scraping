@@ -14,7 +14,7 @@ async function scrapeTerm(session) {
     name: "*2. Select a School (required):",
   });
   const schools = await getComboboxOptions(schoolsCombobox);
-  console.log(false, `${schools.length} schools: ${schools}`);
+  // console.log(false, `${schools.length} schools: ${schools}`);
   assert(!strictMode || schools.length > 0);
 
   // scrape each school
@@ -27,7 +27,7 @@ async function scrapeTerm(session) {
     await response;
     session.school = school;
 
-    console.log(false, `Scraping school: ${school}`);
+    // console.log(false, `Scraping school: ${school}`);
     await scrapeSchool(session);
   }
 }

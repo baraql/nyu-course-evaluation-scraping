@@ -10,7 +10,7 @@ async function scrapeEvaluations(page, termNumber) {
     name: "*1. Select a Term (required) :",
   });
   const terms = await getComboboxOptions(termsCombobox);
-  console.log(false, `${terms.length} terms: ${terms}`);
+  // console.log(false, `${terms.length} terms: ${terms}`);
   // assert(!strictMode || terms.length > 0);
 
   // scrape each term
@@ -21,10 +21,10 @@ async function scrapeEvaluations(page, termNumber) {
   const response = waitForAlbertResponse(page);
   await termsCombobox.selectOption(term);
   await response;
-  const session = { page: page };
+  const session = { page: page, termNumber: termNumber };
   session.term = term;
 
-  console.log(false, `Scraping term: ${term}`);
+  // console.log(false, `Scraping term: ${term}`);
   await scrapeTerm(session);
   // }
 }

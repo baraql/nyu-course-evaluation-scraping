@@ -12,7 +12,7 @@ async function scrapeSubject(session) {
 
   // we can skip
   if (fs.existsSync(path)) {
-    console.log(false, `Skipping ${subject}`);
+    console.log(false, `Skipping ${school}_${subject} on scraper #${term}`);
     return;
   }
 
@@ -35,7 +35,7 @@ async function scrapeSubject(session) {
   // if this element exists, we are in courses page
   await frame.getByText("Filter Results By:").waitFor();
   const courses = await frame.locator(".ps_grid-row").all();
-  console.log(false, `${courses.length} courses`);
+  // console.log(false, `${courses.length} courses`);
   if (courses.length === 0) {
     try {
       await frame.getByRole("button", { name: "OK" }).click();
