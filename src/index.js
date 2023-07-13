@@ -25,12 +25,12 @@ async function scraper(termNumber) {
   const page = await browser.newPage();
   page.setDefaultTimeout(1000000);
 
-  await logIntoAlbert(page, NYU_USERNAME, NYU_PASSWORD);
-  await waitForAlbertResponse(page);
-  await openEvaluations(page);
-  await scrapeEvaluations(page, termNumber);
-  await page.waitForTimeout(10000);
-  await browser.close();
+  logIntoAlbert(page, NYU_USERNAME, NYU_PASSWORD);
+  waitForAlbertResponse(page);
+  openEvaluations(page);
+  scrapeEvaluations(page, termNumber);
+  // await page.waitForTimeout(10000);
+  // await browser.close();
 }
 
 async function main() {
