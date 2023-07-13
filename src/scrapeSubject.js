@@ -47,8 +47,11 @@ async function scrapeSubject(session) {
       }
     }
   } else {
-    // scrape every course
-    for (const course of courses) {
+    session.courseT = courses.length;
+    // scrape each course
+    for (var i = 0; i < courses.length; i++) {
+      const course = courses[i];
+      session.courseN = courses.length;
       // click into evaluations page
       const evaluationsResponse = waitForAlbertResponse(session.page);
       await course

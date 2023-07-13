@@ -16,11 +16,13 @@ async function scrapeTerm(session) {
   const schools = await getComboboxOptions(schoolsCombobox);
   // console.log(false, `${schools.length} schools: ${schools}`);
   assert(!strictMode || schools.length > 0);
-
+  session.schoolT = schools.length;
   // scrape each school
-  for (const school of schools) {
-    if (school === "GLOB") continue;
 
+  for (var i = 0; i < schools.length; i++) {
+    const school = schools[i];
+    if (school === "GLOB") continue;
+    session.schoolN = i;
     // select term
     const response = waitForAlbertResponse(session.page);
     await schoolsCombobox.selectOption(school);

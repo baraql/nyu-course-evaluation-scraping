@@ -27,10 +27,12 @@ async function scrapeCourse(session) {
       session.termNumber +
       " is scraping " +
       session.term +
-      "_" +
+      "____" +
       session.school +
-      "_" +
+      `(${session.schoolN}/${session.schoolT})` +
+      "____" +
       session.subject +
+      `(${session.subjectN}/${session.subjectT})____` +
       " (" +
       sections.length +
       " sections)"

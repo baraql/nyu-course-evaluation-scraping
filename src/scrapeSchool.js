@@ -14,8 +14,11 @@ async function scrapeSchool(session) {
   // console.log(false, `${subjects.length} subjects: ${subjects}`);
   //   assert(!strictMode || subjects.length > 0);
 
+  session.subjectT = subjects.length;
   // scrape each subject
-  for (const subject of subjects) {
+  for (var i = 0; i < subjects.length; i++) {
+    const subject = subjects[i];
+    session.subjectN = subjects.length;
     // select term
     const response = waitForAlbertResponse(session.page);
     await subjectsCombobox.selectOption(subject); // TODO: sometimes fails
