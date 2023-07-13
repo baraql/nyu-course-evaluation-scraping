@@ -5,7 +5,7 @@ function saveData(path, data) {
     fs.mkdirSync("data/");
   }
   fs.writeFileSync(path, JSON.stringify(data, undefined, 2) + "\n");
-  console.log(true, `Saved data to ${path}`);
+  console.log(`Saved data to ${path}`);
 }
 
 module.exports = { saveData };

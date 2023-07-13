@@ -12,7 +12,9 @@ async function scrapeSubject(session) {
 
   // we can skip
   if (fs.existsSync(path)) {
-    console.log(false, `Skipping ${school}_${subject} on scraper #${term}`);
+    console.log(
+      `Scraper #${session.termNumber} is skipping ${term}_${school}_${subject}`
+    );
     return;
   }
 

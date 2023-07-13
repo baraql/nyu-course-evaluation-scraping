@@ -70,7 +70,7 @@ async function scrapeCourse(session) {
           .nth(1)
           .innerText()
       );
-      console.log(true, question, average);
+      // console.log(true, question, average);
       //   assert(!strictMode || !Number.isNaN(average));
       questionSection.push({ question, average });
     }
