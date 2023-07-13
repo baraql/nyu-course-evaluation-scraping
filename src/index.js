@@ -14,7 +14,7 @@ async function scraper(termNumber) {
   const browser = await chromium.launchPersistentContext(
     "./user-data-many/" + termNumber + "/",
     {
-      headless: false,
+      headless: true,
     }
   );
 
@@ -23,21 +23,35 @@ async function scraper(termNumber) {
   await aboutBlankPage.close();
 
   const page = await browser.newPage();
-  page.setDefaultTimeout(1000000);
+  page.setDefaultTimeout(2147483647);
 
   logIntoAlbert(page, NYU_USERNAME, NYU_PASSWORD);
   waitForAlbertResponse(page);
   openEvaluations(page);
-  scrapeEvaluations(page, termNumber);
-  // await page.waitForTimeout(10000);
-  // await browser.close();
+  await scrapeEvaluations(page, termNumber);
+  await page.waitForTimeout(10000);
+  await browser.close();
+  console.log("done");
+}
+
+async function scraperShell(termNumber) {
+  var loop = false;
+  do {
+    console.log("starting" + termNumber);
+    try {
+      await scraper(termNumber);
+      loop = false;
+    } catch {
+      loop = true;
+    }
+  } while (loop);
 }
 
 async function main() {
   var scrapers = [];
 
   for (let i = 0; i < 19; i++) {
-    scrapers.push(scraper(i));
+    scrapers.push(scraperShell(i));
   }
 
   await Promise.all(scrapers);
