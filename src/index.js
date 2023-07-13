@@ -58,7 +58,7 @@ async function main() {
     for (let i = 0; i < 19; i++) {
       scrapers.push(scraperShell(i));
     }
-    await Promise.all(debugNum);
+    await Promise.all(scrapers);
   }
 }
 
