@@ -8,28 +8,41 @@ const { wipeChromeWorkerData } = require("./chromeWorkerData.js");
 const { startDashboard, updateSessionVariables } = require("./dashboard.js");
 
 const INITIAL_LOGIN = false;
-const KILL_THRESHOLD = 500 * 1024 * 1024; // 500MB in bytes
-const SPAWN_THRESHOLD = 750 * 1024 * 1024; // 750MB in bytes
+const KILL_THRESHOLD = 100 * 1024 * 1024; // 500MB in bytes
+const SPAWN_THRESHOLD = 300 * 1024 * 1024; // 750MB in bytes
+global.DEBUG = false;
 
 function dashClock() {
   updateSessionVariables(os.freemem(), os.totalmem());
 }
 
+var killOnNext = false;
+var startOnNext = false;
 function memClock() {
   const freeMemory = os.freemem();
   if (freeMemory < KILL_THRESHOLD) {
     // kill a worker
-    killAWorker();
-  } else if (freeMemory > SPAWN_THRESHOLD) {
+    if (killOnNext) {
+      killAWorker();
+    } else {
+      killOnNext = true;
+    }
+    killOnNext = false;
+  } else if (freeMemory > SPAWN_THRESHOLD && !global.DEBUG) {
     // spawn a worker
-    giveMeANewWorker();
+    if (startOnNext) {
+      giveMeANewWorker();
+    } else {
+      startOnNext = true;
+    }
+    startOnNext = false;
   }
 }
 
 async function main() {
   startDashboard();
   setInterval(dashClock, 1_000);
-  setInterval(memClock, 10_000);
+  setInterval(memClock, 30_000);
 
   if (!fs.existsSync("data/")) {
     fs.mkdirSync("data/");
@@ -49,8 +62,12 @@ async function main() {
   await wipeChromeWorkerData();
   global.sessions = {};
 
-  for (var i = 0; i < 10; i++) {
+  if (global.DEBUG) {
     giveMeANewWorker();
+  } else {
+    for (var i = 0; i < 3; i++) {
+      giveMeANewWorker();
+    }
   }
 }
 
@@ -73,10 +90,11 @@ function killAWorker() {
       workerIdToKill = workerId;
     }
   }
-  console.log(
-    `worker: ${workerIdToKill}` +
-      JSON.stringify(global.sessions[workerIdToKill])
-  );
+  // console.log(
+  //   `worker: ${workerIdToKill}` +
+  //     JSON.stringify(global.sessions[workerIdToKill])
+  // );
+  console.log(`Killing worker #${workerIdToKill}.`);
 
   global.sessions[workerIdToKill].shouldCancel = true;
 }

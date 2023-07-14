@@ -46,19 +46,19 @@ const box = blessed.box({
 function updateSessionVariables(freeMem, totalMem) {
   if (global.sessions) {
     const workerIds = Object.keys(global.sessions);
-    const variables = workerIds
-      .map((key) => {
-        const s = global.sessions[key];
-        return `Scraped: ${global.totalSaved}/${global.totalToScrape} (${
-          global.subjectsToScrape.length
-        } remaining).\nMemory: ${formatBytes(freeMem)}/${formatBytes(
-          totalMem
-        )}.\n\n${key}: ${s.term}_${s.school}_${s.subject} -- (${s.courseN}/${
-          s.courseT
-        })}`;
-      })
-      .join("\n");
-    box.setContent(variables);
+    const header = `Scraped: ${global.totalSaved}/${global.totalToScrape} (${
+      global.subjectsToScrape.length
+    } remaining).\nMemory: ${formatBytes(freeMem)}/${formatBytes(totalMem)}.\n`;
+    const workerStatuses = workerIds.map((key) => {
+      const s = global.sessions[key];
+      if (s) {
+        return `\n${key}: ${s.term}_${s.school}_${s.subject} -- (${s.courseN}/${s.courseT})}`;
+      } else {
+        return "";
+      }
+    });
+
+    box.setContent(header + workerStatuses);
   } else {
     box.setContent(`No sessions`);
   }
