@@ -14,7 +14,7 @@ const debugNum = -1;
 async function scraper(termNumber) {
   // Setup
   const browser = await chromium.launchPersistentContext(
-    "./user-data-many/" + termNumber + "/",
+    "./cache/worker-chrome-data/" + termNumber + "/",
     {
       headless: debugNum >= 0 ? false : true,
     }
@@ -55,7 +55,7 @@ async function main() {
     await scraperShell(debugNum);
   } else {
     var scrapers = [];
-    for (let i = 0; i < 19; i++) {
+    for (let i = 0; i < 10; i++) {
       scrapers.push(scraperShell(i));
     }
     await Promise.all(scrapers);
