@@ -3,9 +3,7 @@ const { scrapeCourse } = require("./scrapeCourse.js");
 const { saveData } = require("./saveData.js");
 const fs = require("fs");
 
-async function scrapeSubject(session) {
-  const { term, school, subject } = session;
-  const { page } = session;
+async function scrapeSubject(page, term, school, subject, workerId) {
   const frame = page.frameLocator('iframe[name="lbFrameContent"]');
 
   const path = `data/${term}_${school}_${subject}.json`;
@@ -13,7 +11,7 @@ async function scrapeSubject(session) {
   // we can skip
   if (fs.existsSync(path)) {
     console.log(
-      `Scraper #${session.termNumber} is skipping ${term}_${school}_${subject}`
+      `Scraper #${workerId} is skipping ${term}_${school}_${subject}`
     );
     return;
   }
@@ -24,15 +22,6 @@ async function scrapeSubject(session) {
   };
 
   const { coursesData } = data;
-
-  // click into courses page
-  const coursesResponse = waitForAlbertResponse(session.page);
-  await frame
-    .getByRole("button", {
-      name: "Click to Search Published Course Evaluation Results",
-    })
-    .click();
-  await coursesResponse;
 
   // if this element exists, we are in courses page
   await frame.getByText("Filter Results By:").waitFor();
@@ -47,15 +36,14 @@ async function scrapeSubject(session) {
       }
     }
   } else {
-    session.courseT = courses.length;
+    global.sessions[workerId]["courseT"] = courses.length;
     // scrape each course
     for (var i = 0; i < courses.length; i++) {
       const course = courses[i];
-      session.courseN = i;
+      global.sessions[workerId]["courseN"] = i + 1;
       // click into evaluations page
-      // session.course =
 
-      const evaluationsResponse = waitForAlbertResponse(session.page);
+      const evaluationsResponse = waitForAlbertResponse(page);
       await course
         .getByRole("button", { name: "Evaluation Results for" })
         .click();
@@ -63,10 +51,10 @@ async function scrapeSubject(session) {
 
       // if this element exists, we are in evaluations data page
       await frame.getByText("Note: Score range is 1 - 5").waitFor();
-      coursesData.push(await scrapeCourse(session));
+      coursesData.push(await scrapeCourse(workerId, page));
 
       // exit evaluations page
-      const exitEvaluationsResponse = waitForAlbertResponse(session.page);
+      const exitEvaluationsResponse = waitForAlbertResponse(page);
       await frame
         .getByRole("link", { name: "> Return to Class List" })
         .first()
@@ -76,7 +64,7 @@ async function scrapeSubject(session) {
   }
 
   // exit out of courses page
-  const exitCoursesResponse = waitForAlbertResponse(session.page);
+  const exitCoursesResponse = waitForAlbertResponse(page);
   await frame
     .getByRole("link", { name: "Return to Term/School/Subject Selection" })
     .first()
@@ -84,7 +72,7 @@ async function scrapeSubject(session) {
   await exitCoursesResponse;
 
   // save scraped data
-  await saveData(path, data);
+  saveData(path, data);
 }
 
 module.exports = { scrapeSubject };

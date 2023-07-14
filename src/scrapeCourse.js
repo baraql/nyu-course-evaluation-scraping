@@ -1,7 +1,6 @@
 const { waitForAlbertResponse } = require("./waitForAlbertResponse.js");
 
-async function scrapeCourse(session) {
-  const { page } = session;
+async function scrapeCourse(workerId, page) {
   const frame = page.frameLocator('iframe[name="lbFrameContent"]');
 
   const data = {
@@ -22,20 +21,6 @@ async function scrapeCourse(session) {
   // console.log(false, `Scraping course: ${metadata["Class Description"]}`);
   //   assert(!strictMode || metadata["Class Description"] !== undefined);
   const sections = await frame.locator(".ps_box-scrollarea-row").all();
-  console.log(
-    "Scraper #" +
-      session.termNumber +
-      " is scraping " +
-      session.term +
-      "____" +
-      session.school +
-      `(${session.schoolN + 1}/${session.schoolT})____` +
-      session.subject +
-      `(${session.subjectN + 1}/${session.subjectT})____` +
-      `(${session.courseN + 1}/${session.courseT})____ (` +
-      sections.length +
-      " sections)"
-  );
   // console.log(true, `${sections.length} sections of questions`);
   for (const section of sections) {
     // some sections can be empty! e.g. Fall 2022, ENGR-UH 1000 LAB4
@@ -44,7 +29,7 @@ async function scrapeCourse(session) {
     const sectionLink = section.getByRole("link");
     const title = (await sectionLink.innerText()).slice(2); // chop off leading "+"
 
-    const questionResponse = waitForAlbertResponse(session.page);
+    const questionResponse = waitForAlbertResponse(page);
     await sectionLink.click();
     await questionResponse;
 

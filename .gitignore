@@ -3,3 +3,5 @@ user-data
 user-data-many
 secrets.js
 data/
+.DS_Store
+cache

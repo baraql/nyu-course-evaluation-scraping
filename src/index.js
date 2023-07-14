@@ -1,20 +1,40 @@
-const { chromium, Page, ScrapingSession, Locator } = require("playwright");
 const fs = require("fs");
-const assert = require("assert");
+const { startInitialBrowser } = require("./startInitialBrowser.js");
+const { getListOfSubjectsToScrape } = require("./getListOfSubjectsToScrape.js");
+const { spawnWorker } = require("./worker.js");
+const { wipeChromeWorkerData } = require("./chromeWorkerData.js");
+const { startDashboard } = require("./dashboard.js");
 
-const { scrapeEvaluations } = require("./scrapeEvaluations.js");
-const { waitForAlbertResponse } = require("./waitForAlbertResponse.js");
-const { logIntoAlbert } = require("./logIntoAlbert.js");
-const { openEvaluations } = require("./openEvaluations.js");
-const { NYU_USERNAME, NYU_PASSWORD } = require("./secrets.js");
-// import { waitForAlbertResponse } from "./waitForAlbertResponse.js";
+const initialLogin = false;
 
-const debugNum = -1;
+async function main() {
+  startDashboard();
 
+  if (!fs.existsSync("data/")) {
+    fs.mkdirSync("data/");
+  }
+
+  // sign in and collect the list of subjects
+
+  if (initialLogin) {
+    const { initialPage, initialBrowser } = await startInitialBrowser();
+    console.log("logged in");
+    global.subjectsToScrape = await getListOfSubjectsToScrape(initialPage);
+    initialBrowser.close();
+  } else {
+    global.subjectsToScrape = await getListOfSubjectsToScrape();
+  }
+  // spawn new workers
+  await wipeChromeWorkerData();
+  global.sessions = {};
+  spawnWorker(0);
+}
+
+/*
 async function scraper(termNumber) {
   // Setup
   const browser = await chromium.launchPersistentContext(
-    "./user-data-many/" + termNumber + "/",
+    "./cache/worker-chrome-data/" + termNumber + "/",
     {
       headless: debugNum >= 0 ? false : true,
     }
@@ -51,15 +71,16 @@ async function scraperShell(termNumber) {
 }
 
 async function main() {
-  if (debugNum >= 0) {
-    await scraperShell(debugNum);
-  } else {
-    var scrapers = [];
-    for (let i = 0; i < 19; i++) {
-      scrapers.push(scraperShell(i));
-    }
-    await Promise.all(scrapers);
-  }
+  // if (debugNum >= 0) {
+  //   await scraperShell(debugNum);
+  // } else {
+  //   var scrapers = [];
+  //   for (let i = 0; i < 19; i++) {
+  //     scrapers.push(scraperShell(i));
+  //   }
+  //   await Promise.all(scrapers);
+  // }
+  begin();
 }
-
+*/
 main();
