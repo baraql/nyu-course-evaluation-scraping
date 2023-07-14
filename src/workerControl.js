@@ -41,13 +41,17 @@ function killAWorker() {
 
 function killWorker(id) {
   // global.sessions[id].shouldCancel = true;
-  global.browsers[id].close();
+  try {
+    global.browsers[id].close();
 
-  delete global.browsers[id];
-  delete global.sessions[id];
+    delete global.browsers[id];
+    delete global.sessions[id];
 
-  if (Object.keys(global.sessions).length == 0) {
-    giveMeANewWorker();
+    if (Object.keys(global.sessions).length == 0) {
+      giveMeANewWorker();
+    }
+  } catch (error) {
+    console.log(error);
   }
 }
 

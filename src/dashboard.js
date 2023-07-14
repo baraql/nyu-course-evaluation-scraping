@@ -28,7 +28,7 @@ function startDashboard() {
 const log = contrib.log({
   parent: screen,
   width: "50%",
-  height: "50%",
+  height: "100%",
   border: "line",
   label: "Console Output",
   scrollable: false, // Disable scrolling
