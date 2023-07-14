@@ -5,13 +5,13 @@ const { logIntoAlbert } = require("./logIntoAlbert.js");
 const { openEvaluations } = require("./openEvaluations.js");
 const { copyChromeWorkerData } = require("./chromeWorkerData.js");
 
-
 async function scraper(workerId) {
   // Setup
   const browser = await chromium.launchPersistentContext(
     "./cache/worker-chrome-data/" + workerId + "/",
     {
       headless: !global.DEBUG,
+      // headless: false,
       bypassCSP: true,
     }
   );
@@ -23,12 +23,13 @@ async function scraper(workerId) {
   const page = await browser.newPage();
   page.setDefaultTimeout(2147483647);
 
-  logIntoAlbert(page);
+  await logIntoAlbert(page);
   console.log("INFO: Worker #" + workerId + " logged in.");
-  openEvaluations(page);
+  await openEvaluations(page);
 
   try {
     do {
+      // console.log("Step A");
       const subjectToScrape = global.subjectsToScrape.pop();
 
       global.sessions[workerId].term = subjectToScrape.term;
@@ -36,14 +37,15 @@ async function scraper(workerId) {
       global.sessions[workerId].subject = subjectToScrape.subject;
 
       await scrapeEvaluation(page, workerId, subjectToScrape);
+      // console.log("Step B");
     } while (global.subjectsToScrape.length > 0);
   } catch (error) {
     if (error === "CANCEL_WORKER") {
       console.log(`Worker #${workerId} was canceled.`);
     } else {
       // Handle other types of errors
-      console.error("An error occurred:", error);
-      exit(1);
+      console.log("An error occurred:", error);
+      // throw "WORKER_ERROR";
     }
   }
   // await page.waitForTimeout(10000);
