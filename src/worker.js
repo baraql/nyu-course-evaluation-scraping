@@ -5,14 +5,14 @@ const { logIntoAlbert } = require("./logIntoAlbert.js");
 const { openEvaluations } = require("./openEvaluations.js");
 const { copyChromeWorkerData } = require("./chromeWorkerData.js");
 
-const debug = true;
+const DEBUG = false;
 
 async function scraper(workerId) {
   // Setup
   const browser = await chromium.launchPersistentContext(
     "./cache/worker-chrome-data/" + workerId + "/",
     {
-      headless: !debug,
+      headless: !DEBUG,
       bypassCSP: true,
     }
   );
