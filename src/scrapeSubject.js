@@ -29,15 +29,20 @@ async function scrapeSubject(page, term, school, subject, workerId) {
   // console.log(false, `${courses.length} courses`);
   if (courses.length === 0) {
     try {
-      // await frame.getByRole("button", { name: "OK" }).click();
+      const promise1 = frame.getByRole("button", { name: "OK" }).click();
+
       const exitCoursesResponse = waitForAlbertResponse(page);
       await frame
         .getByRole("link", { name: "Return to Term/School/Subject Selection" })
         .first()
         .click();
       await exitCoursesResponse;
-      saveData(path, data);
-      return;
+      const promise2 = exitCoursesResponse.then(() => {
+        saveData(path, data);
+        return;
+      });
+
+      Promise.race([promise1, promise2]);
     } catch (err) {
       // if (!(err instanceof errors.TimeoutError)) {
       throw err;

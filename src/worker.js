@@ -29,8 +29,8 @@ async function scraper(workerId) {
   console.log("INFO: Worker #" + workerId + " logged in.");
   await openEvaluations(page);
 
-  try {
-    do {
+  do {
+    try {
       // console.log("Step A");
       const subjectToScrape = global.subjectsToScrape.pop();
 
@@ -43,20 +43,21 @@ async function scraper(workerId) {
 
       await scrapeEvaluation(page, workerId, subjectToScrape);
       // console.log("Step B");
-    } while (global.subjectsToScrape.length > 0);
-  } catch (error) {
-    if (error === "CANCEL_WORKER") {
-      console.log(`Worker #${workerId} was canceled.`);
-    } else if (
-      !error.message.includes("Target") &&
-      !error.message.includes("Page")
-    ) {
-      // Handle other types of errors
-      console.log("An error occurred: ", error);
-      // throw "WORKER_ERROR";
-      await browser.close();
+    } catch (error) {
+      if (error === "CANCEL_WORKER") {
+        console.log(`Worker #${workerId} was canceled.`);
+      } else if (
+        !error.message.includes("Target") &&
+        !error.message.includes("Page")
+      ) {
+        // Handle other types of errors
+        console.log("An error occurred: ", error);
+        // throw "WORKER_ERROR";
+        await browser.close();
+        break;
+      }
     }
-  }
+  } while (global.subjectsToScrape.length > 0);
 
   delete global.browsers[workerId];
   delete global.sessions[workerId];
