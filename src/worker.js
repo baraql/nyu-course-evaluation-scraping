@@ -47,7 +47,10 @@ async function scraper(workerId) {
   } catch (error) {
     if (error === "CANCEL_WORKER") {
       console.log(`Worker #${workerId} was canceled.`);
-    } else if (!error.message.includes("Target")) {
+    } else if (
+      !error.message.includes("Target") &&
+      !error.message.includes("Page")
+    ) {
       // Handle other types of errors
       console.log("An error occurred: ", error);
       // throw "WORKER_ERROR";

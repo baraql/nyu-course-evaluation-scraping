@@ -14,7 +14,7 @@ global.DEBUG = false;
 const DASH = true;
 
 const INITIAL_LOGIN = false;
-const START_WORKERS = 10;
+const START_WORKERS = 15;
 
 const KILL_THRESHOLD = 100 * 1024 * 1024; // 500MB in bytes
 const SPAWN_THRESHOLD = 300 * 1024 * 1024; // 750MB in bytes
