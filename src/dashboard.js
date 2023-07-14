@@ -7,7 +7,7 @@ const screen = blessed.screen({
 
 function startDashboard() {
   // Define and configure your dashboard widgets here
-  sessionsWindow(screen);
+  screen.append(box);
 
   screen.key(["C-c"], (ch, key) => {
     process.exit(0);
@@ -15,10 +15,6 @@ function startDashboard() {
 
   screen.render();
 }
-
-module.exports = {
-  startDashboard,
-};
 
 // Get the screen width
 const screenWidth = screen.width;
@@ -46,21 +42,20 @@ const box = blessed.box({
   },
 });
 
-function sessionsWindow() {
-  // Call the updateSessionVariables function periodically
-  setInterval(updateSessionVariables, 1000); // Update every second
-
-  screen.append(box);
-}
-
 // Update the box with session variable values
-function updateSessionVariables() {
+function updateSessionVariables(freeMem, totalMem) {
   if (global.sessions) {
     const workerIds = Object.keys(global.sessions);
     const variables = workerIds
       .map((key) => {
         const s = global.sessions[key];
-        return `Scraped: ${global.totalSaved}/${global.totalToScrape} (${global.subjectsToScrape.length} remaining).\n\n${key}: ${s.term}_${s.school}_${s.subject} -- (${s.courseN}/${s.courseT})}`;
+        return `Scraped: ${global.totalSaved}/${global.totalToScrape} (${
+          global.subjectsToScrape.length
+        } remaining).\nMemory: ${formatBytes(freeMem)}/${formatBytes(
+          totalMem
+        )}.\n\n${key}: ${s.term}_${s.school}_${s.subject} -- (${s.courseN}/${
+          s.courseT
+        })}`;
       })
       .join("\n");
     box.setContent(variables);
@@ -69,3 +64,15 @@ function updateSessionVariables() {
   }
   screen.render();
 }
+
+function formatBytes(bytes) {
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+  if (bytes === 0) return "0 Bytes";
+  const i = Math.floor(Math.log2(bytes) / 10);
+  return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`;
+}
+
+module.exports = {
+  startDashboard,
+  updateSessionVariables,
+};

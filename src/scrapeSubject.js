@@ -41,6 +41,9 @@ async function scrapeSubject(page, term, school, subject, workerId) {
     for (var i = 0; i < courses.length; i++) {
       const course = courses[i];
       global.sessions[workerId]["courseN"] = i + 1;
+      if (global.sessions[workerId].shouldCancel) {
+        throw "CANCEL_WORKER";
+      }
       // click into evaluations page
 
       const evaluationsResponse = waitForAlbertResponse(page);

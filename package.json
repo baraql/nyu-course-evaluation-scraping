@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "blessed": "^0.1.81",
+    "cancelable-promise": "^4.3.1",
     "fs": "^0.0.1-security",
     "fs-extra": "^11.1.1",
     "playwright": "^1.32.0"
