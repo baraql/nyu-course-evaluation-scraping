@@ -7,10 +7,13 @@ const { spawnWorker } = require("./worker.js");
 const { wipeChromeWorkerData } = require("./chromeWorkerData.js");
 const { startDashboard, updateSessionVariables } = require("./dashboard.js");
 
+global.DEBUG = false;
+
 const INITIAL_LOGIN = false;
+const START_WORKERS = 5;
+
 const KILL_THRESHOLD = 100 * 1024 * 1024; // 500MB in bytes
 const SPAWN_THRESHOLD = 300 * 1024 * 1024; // 750MB in bytes
-global.DEBUG = false;
 
 function dashClock() {
   updateSessionVariables(os.freemem(), os.totalmem());
@@ -65,7 +68,7 @@ async function main() {
   if (global.DEBUG) {
     giveMeANewWorker();
   } else {
-    for (var i = 0; i < 3; i++) {
+    for (var i = 0; i < START_WORKERS; i++) {
       giveMeANewWorker();
     }
   }
