@@ -49,11 +49,9 @@ async function main() {
   await wipeChromeWorkerData();
   global.sessions = {};
 
-  giveMeANewWorker();
-  setTimeout(() => {
-    console.log("Delayed for 5 seconds.");
-    killAWorker();
-  }, "5000");
+  for (var i = 0; i < 10; i++) {
+    giveMeANewWorker();
+  }
 }
 
 function giveMeANewWorker() {
