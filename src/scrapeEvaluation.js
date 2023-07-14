@@ -3,7 +3,7 @@ const { scrapeSubject } = require("./scrapeSubject.js");
 
 async function scrapeEvaluation(page, workerId, subjectToScrape) {
   const frame = await page.frameLocator('iframe[name="lbFrameContent"]');
-  // logMessage("Step 1");
+  // console.log("Step 1");
 
   // get list of all terms
   const termsCombobox = frame.getByRole("combobox", {
@@ -19,22 +19,22 @@ async function scrapeEvaluation(page, workerId, subjectToScrape) {
   var coursesResponse = waitForAlbertResponse(page);
   await termsCombobox.selectOption(subjectToScrape.term);
   await coursesResponse;
-  // logMessage("Step 2");
+  // console.log("Step 2");
   coursesResponse = waitForAlbertResponse(page);
   await schoolsCombobox.selectOption(subjectToScrape.school);
   await coursesResponse;
-  // logMessage("Step 3");
+  // console.log("Step 3");
   coursesResponse = waitForAlbertResponse(page);
   await subjectsCombobox.selectOption(subjectToScrape.subject);
   await coursesResponse;
-  // logMessage("Step 4");
+  // console.log("Step 4");
 
   await frame
     .getByRole("button", {
       name: "Click to Search Published Course Evaluation Results",
     })
     .click();
-  // logMessage("Step 5");
+  // console.log("Step 5");
   await scrapeSubject(
     page,
     subjectToScrape.term,
@@ -42,9 +42,9 @@ async function scrapeEvaluation(page, workerId, subjectToScrape) {
     subjectToScrape.subject,
     workerId
   );
-  // logMessage("Step 6");
+  // console.log("Step 6");
   // await waitForAlbertResponse(page);
-  // logMessage("Step 7");
+  // console.log("Step 7");
 }
 
 module.exports = { scrapeEvaluation };

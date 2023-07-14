@@ -17,25 +17,25 @@ async function readSubjectsCached(initialPage) {
 
     const stats = await statAsync(subjectCachePath);
 
-    logMessage("File exists.");
-    logMessage("File size:", stats.size);
-    logMessage("Last modified:", stats.mtime);
+    console.log("File exists.");
+    console.log("File size:", stats.size);
+    console.log("Last modified:", stats.mtime);
 
     const currentDate = new Date();
     const threeMonthsAgo = new Date();
     threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
 
     if (stats.mtime > threeMonthsAgo && stats.mtime < currentDate) {
-      logMessage("Using subject cache...");
+      console.log("Using subject cache...");
       const fileContents = await readFileAsync(subjectCachePath, "utf-8");
       const subjects = JSON.parse(fileContents);
       return subjects;
     } else {
-      logMessage("File was not modified within the last 3 months.");
+      console.log("File was not modified within the last 3 months.");
     }
   } catch (err) {
     if (err.code === "ENOENT") {
-      logMessage("File does not exist.");
+      console.log("File does not exist.");
     } else {
       console.error("An error occurred while checking the file:", err);
     }
@@ -52,7 +52,7 @@ async function collectAndCacheData(page) {
 
   try {
     await writeFileAsync(subjectCachePath, jsonString);
-    logMessage("File has been successfully written.");
+    console.log("File has been successfully written.");
   } catch (err) {
     console.error("An error occurred while writing the file:", err);
     exit(1);

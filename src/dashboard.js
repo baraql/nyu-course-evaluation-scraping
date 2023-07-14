@@ -34,10 +34,10 @@ const log = contrib.log({
   scrollable: false, // Disable scrolling
 });
 
-// Function to log a message to the log widget
-function logMessage(message) {
-  log.log(message);
-}
+console.log = (...args) => {
+  log.log(args.join(" ") + "\n");
+  screen.render();
+};
 
 // Get the screen width
 const screenWidth = screen.width;

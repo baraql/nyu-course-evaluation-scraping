@@ -26,12 +26,12 @@ async function scraper(workerId) {
   page.setDefaultTimeout(2147483647);
 
   await logIntoAlbert(page);
-  logMessage("INFO: Worker #" + workerId + " logged in.");
+  console.log("INFO: Worker #" + workerId + " logged in.");
   await openEvaluations(page);
 
   try {
     do {
-      // logMessage("Step A");
+      // console.log("Step A");
       const subjectToScrape = global.subjectsToScrape.pop();
 
       global.sessions[workerId].term = subjectToScrape.term;
@@ -42,22 +42,21 @@ async function scraper(workerId) {
       global.sessions[workerId].courseT = -1;
 
       await scrapeEvaluation(page, workerId, subjectToScrape);
-      // logMessage("Step B");
+      // console.log("Step B");
     } while (global.subjectsToScrape.length > 0);
   } catch (error) {
     if (error === "CANCEL_WORKER") {
-      logMessage(`Worker #${workerId} was canceled.`);
-    } else {
+      console.log(`Worker #${workerId} was canceled.`);
+    } else if (!error.message.includes("Target")) {
       // Handle other types of errors
-      logMessage("An error occurred:", error);
+      console.log("An error occurred: ", error);
       // throw "WORKER_ERROR";
+      await browser.close();
     }
   }
-  if (browser.pages().length != 0) {
-    await browser.close();
-  }
-  global.sessions[workerId] = null;
-  global.browsers[workerId] = null;
+
+  delete global.browsers[workerId];
+  delete global.sessions[workerId];
 }
 
 // prevent killing browser from ending program
@@ -72,7 +71,7 @@ function spawnWorker(workerId) {
   try {
     workerWrapper(workerId);
   } catch (error) {
-    logMessage("FATAL: " + error);
+    console.log("FATAL: " + error);
   }
 }
 

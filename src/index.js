@@ -14,7 +14,7 @@ global.DEBUG = false;
 const DASH = true;
 
 const INITIAL_LOGIN = false;
-const START_WORKERS = 5;
+const START_WORKERS = 10;
 
 const KILL_THRESHOLD = 100 * 1024 * 1024; // 500MB in bytes
 const SPAWN_THRESHOLD = 300 * 1024 * 1024; // 750MB in bytes
@@ -30,33 +30,33 @@ var startOnNext = false;
 var sessionsCopy = global.sessions;
 
 function memClock() {
-  const freeMemory = os.freemem();
-  if (freeMemory < KILL_THRESHOLD) {
-    // kill a worker
-    logMessage("killAWorker: " + killOnNext);
-    if (killOnNext) {
-      killAWorker();
-      killOnNext = false;
-    } else {
-      killOnNext = true;
-    }
+  // const freeMemory = os.freemem();
+  // if (freeMemory < KILL_THRESHOLD) {
+  //   // kill a worker
+  //   console.log("killAWorker: " + killOnNext);
+  //   if (killOnNext) {
+  //     killAWorker();
+  //     killOnNext = false;
+  //   } else {
+  //     killOnNext = true;
+  //   }
 
-    startOnNext = false;
-  } else if (freeMemory > SPAWN_THRESHOLD && !global.DEBUG) {
-    // spawn a worker
-    logMessage("startOnNext: " + startOnNext);
-    if (startOnNext) {
-      giveMeANewWorker();
-      startOnNext = false;
-    } else {
-      startOnNext = true;
-    }
+  //   startOnNext = false;
+  // } else if (freeMemory > SPAWN_THRESHOLD && !global.DEBUG) {
+  //   // spawn a worker
+  //   console.log("startOnNext: " + startOnNext);
+  //   if (startOnNext) {
+  //     giveMeANewWorker();
+  //     startOnNext = false;
+  //   } else {
+  //     startOnNext = true;
+  //   }
 
-    killOnNext = false;
-  } else {
-    startOnNext = false;
-    killOnNext = false;
-  }
+  //   killOnNext = false;
+  // } else {
+  //   startOnNext = false;
+  //   killOnNext = false;
+  // }
 
   for (const key of Object.keys(global.sessions)) {
     try {
@@ -64,8 +64,10 @@ function memClock() {
         JSON.stringify(sessionsCopy[key]) ===
         JSON.stringify(global.sessions[key])
       ) {
-        logMessage("Killing stagnant worker #" + key + ".");
+        console.log("Restarting stagnant worker #" + key + ".");
         killWorker(key);
+        giveMeANewWorker();
+        break;
       }
     } catch {}
   }
@@ -77,7 +79,7 @@ async function main() {
     startDashboard();
     setInterval(dashClock, 1_000);
   }
-  setInterval(memClock, 10_000);
+  setInterval(memClock, 30_000);
 
   if (!fs.existsSync("data/")) {
     fs.mkdirSync("data/");
@@ -87,7 +89,7 @@ async function main() {
 
   if (INITIAL_LOGIN) {
     const { initialPage, initialBrowser } = await startInitialBrowser();
-    logMessage("logged in");
+    console.log("logged in");
     global.subjectsToScrape = await getListOfSubjectsToScrape(initialPage);
     initialBrowser.close();
   } else {
