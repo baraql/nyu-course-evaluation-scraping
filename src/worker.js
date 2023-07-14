@@ -16,6 +16,8 @@ async function scraper(workerId) {
     }
   );
 
+  global.browsers[workerId] = browser;
+
   // Close the initial about:blank page
   const [aboutBlankPage] = browser.pages();
   await aboutBlankPage.close();
@@ -24,44 +26,54 @@ async function scraper(workerId) {
   page.setDefaultTimeout(2147483647);
 
   await logIntoAlbert(page);
-  console.log("INFO: Worker #" + workerId + " logged in.");
+  logMessage("INFO: Worker #" + workerId + " logged in.");
   await openEvaluations(page);
 
   try {
     do {
-      // console.log("Step A");
+      // logMessage("Step A");
       const subjectToScrape = global.subjectsToScrape.pop();
 
       global.sessions[workerId].term = subjectToScrape.term;
       global.sessions[workerId].school = subjectToScrape.school;
       global.sessions[workerId].subject = subjectToScrape.subject;
 
+      global.sessions[workerId].courseN = -1;
+      global.sessions[workerId].courseT = -1;
+
       await scrapeEvaluation(page, workerId, subjectToScrape);
-      // console.log("Step B");
+      // logMessage("Step B");
     } while (global.subjectsToScrape.length > 0);
   } catch (error) {
     if (error === "CANCEL_WORKER") {
-      console.log(`Worker #${workerId} was canceled.`);
+      logMessage(`Worker #${workerId} was canceled.`);
     } else {
       // Handle other types of errors
-      console.log("An error occurred:", error);
+      logMessage("An error occurred:", error);
       // throw "WORKER_ERROR";
     }
   }
-  // await page.waitForTimeout(10000);
-  await browser.close();
-  global.sessions[workerId] = null;
-  if (Object.keys(global.sessions).length == 0) {
-    console.log("No workers left. Process done.");
-    exit(0);
+  if (browser.pages().length != 0) {
+    await browser.close();
   }
+  global.sessions[workerId] = null;
+  global.browsers[workerId] = null;
 }
 
-async function spawnWorker(workerId) {
+// prevent killing browser from ending program
+async function workerWrapper(workerId) {
   global.sessions[workerId] = { shouldCancel: false };
   copyChromeWorkerData(workerId);
 
   return scraper(workerId);
+}
+
+function spawnWorker(workerId) {
+  try {
+    workerWrapper(workerId);
+  } catch (error) {
+    logMessage("FATAL: " + error);
+  }
 }
 
 module.exports = { spawnWorker };

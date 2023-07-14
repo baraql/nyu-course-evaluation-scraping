@@ -10,9 +10,7 @@ async function scrapeSubject(page, term, school, subject, workerId) {
 
   // we can skip
   if (fs.existsSync(path)) {
-    console.log(
-      `Scraper #${workerId} is skipping ${term}_${school}_${subject}`
-    );
+    logMessage(`Scraper #${workerId} is skipping ${term}_${school}_${subject}`);
     return;
   }
 
@@ -26,14 +24,22 @@ async function scrapeSubject(page, term, school, subject, workerId) {
   // if this element exists, we are in courses page
   await frame.getByText("Filter Results By:").waitFor();
   const courses = await frame.locator(".ps_grid-row").all();
-  // console.log(false, `${courses.length} courses`);
+  // logMessage(false, `${courses.length} courses`);
   if (courses.length === 0) {
     try {
-      await frame.getByRole("button", { name: "OK" }).click();
+      // await frame.getByRole("button", { name: "OK" }).click();
+      const exitCoursesResponse = waitForAlbertResponse(page);
+      await frame
+        .getByRole("link", { name: "Return to Term/School/Subject Selection" })
+        .first()
+        .click();
+      await exitCoursesResponse;
+      saveData(path, data);
+      return;
     } catch (err) {
-      if (!(err instanceof errors.TimeoutError)) {
-        throw err;
-      }
+      // if (!(err instanceof errors.TimeoutError)) {
+      throw err;
+      // }
     }
   } else {
     global.sessions[workerId]["courseT"] = courses.length;

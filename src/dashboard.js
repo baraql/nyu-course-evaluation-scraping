@@ -1,4 +1,6 @@
 const blessed = require("blessed");
+const { giveMeANewWorker, killAWorker } = require("./workerControl.js");
+const contrib = require("blessed-contrib");
 
 const screen = blessed.screen({
   smartCSR: true,
@@ -13,7 +15,28 @@ function startDashboard() {
     process.exit(0);
   });
 
+  screen.key(["C-k"], (ch, key) => {
+    killAWorker();
+  });
+  screen.key(["C-s"], (ch, key) => {
+    giveMeANewWorker();
+  });
+
   screen.render();
+}
+
+const log = contrib.log({
+  parent: screen,
+  width: "50%",
+  height: "50%",
+  border: "line",
+  label: "Console Output",
+  scrollable: false, // Disable scrolling
+});
+
+// Function to log a message to the log widget
+function logMessage(message) {
+  log.log(message);
 }
 
 // Get the screen width
@@ -48,7 +71,11 @@ function updateSessionVariables(freeMem, totalMem) {
     const workerIds = Object.keys(global.sessions);
     const header = `Scraped: ${global.totalSaved}/${global.totalToScrape} (${
       global.subjectsToScrape.length
-    } remaining).\nMemory: ${formatBytes(freeMem)}/${formatBytes(totalMem)}.\n`;
+    } remaining).\nMemory: ${formatBytes(freeMem)}/${formatBytes(
+      totalMem
+    )}.\nBrowsers: ${
+      Object.keys(global.browsers).length
+    }.\nctrl-s => start worker\nctrl-k => kill worker\nctrl-c => exit\n`;
     const workerStatuses = workerIds.map((key) => {
       const s = global.sessions[key];
       if (s) {

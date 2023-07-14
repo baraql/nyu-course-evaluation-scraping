@@ -3,11 +3,15 @@ const os = require("os");
 
 const { startInitialBrowser } = require("./startInitialBrowser.js");
 const { getListOfSubjectsToScrape } = require("./getListOfSubjectsToScrape.js");
-const { spawnWorker } = require("./worker.js");
 const { wipeChromeWorkerData } = require("./chromeWorkerData.js");
-const { startDashboard, updateSessionVariables } = require("./dashboard.js");
+const {
+  giveMeANewWorker,
+  killAWorker,
+  killWorker,
+} = require("./workerControl.js");
 
 global.DEBUG = false;
+const DASH = true;
 
 const INITIAL_LOGIN = false;
 const START_WORKERS = 5;
@@ -15,37 +19,65 @@ const START_WORKERS = 5;
 const KILL_THRESHOLD = 100 * 1024 * 1024; // 500MB in bytes
 const SPAWN_THRESHOLD = 300 * 1024 * 1024; // 750MB in bytes
 
+const { updateSessionVariables, startDashboard } = require("./dashboard.js");
+
 function dashClock() {
   updateSessionVariables(os.freemem(), os.totalmem());
 }
 
 var killOnNext = false;
 var startOnNext = false;
+var sessionsCopy = global.sessions;
+
 function memClock() {
   const freeMemory = os.freemem();
   if (freeMemory < KILL_THRESHOLD) {
     // kill a worker
+    logMessage("killAWorker: " + killOnNext);
     if (killOnNext) {
       killAWorker();
+      killOnNext = false;
     } else {
       killOnNext = true;
     }
-    killOnNext = false;
+
+    startOnNext = false;
   } else if (freeMemory > SPAWN_THRESHOLD && !global.DEBUG) {
     // spawn a worker
+    logMessage("startOnNext: " + startOnNext);
     if (startOnNext) {
       giveMeANewWorker();
+      startOnNext = false;
     } else {
       startOnNext = true;
     }
+
+    killOnNext = false;
+  } else {
     startOnNext = false;
+    killOnNext = false;
   }
+
+  for (const key of Object.keys(global.sessions)) {
+    try {
+      if (
+        JSON.stringify(sessionsCopy[key]) ===
+        JSON.stringify(global.sessions[key])
+      ) {
+        logMessage("Killing stagnant worker #" + key + ".");
+        killWorker(key);
+      }
+    } catch {}
+  }
+  sessionsCopy = JSON.parse(JSON.stringify(global.sessions));
 }
 
 async function main() {
-  startDashboard();
-  setInterval(dashClock, 1_000);
-  setInterval(memClock, 30_000);
+  if (DASH) {
+    startDashboard();
+    setInterval(dashClock, 1_000);
+  }
+  setInterval(memClock, 10_000);
 
   if (!fs.existsSync("data/")) {
     fs.mkdirSync("data/");
@@ -55,7 +87,7 @@ async function main() {
 
   if (INITIAL_LOGIN) {
     const { initialPage, initialBrowser } = await startInitialBrowser();
-    console.log("logged in");
+    logMessage("logged in");
     global.subjectsToScrape = await getListOfSubjectsToScrape(initialPage);
     initialBrowser.close();
   } else {
@@ -64,6 +96,7 @@ async function main() {
   // spawn new workers
   await wipeChromeWorkerData();
   global.sessions = {};
+  global.browsers = {};
 
   if (global.DEBUG) {
     giveMeANewWorker();
@@ -72,34 +105,6 @@ async function main() {
       giveMeANewWorker();
     }
   }
-}
-
-function giveMeANewWorker() {
-  const workerId = Object.keys(global.sessions).length;
-  spawnWorker(workerId);
-}
-
-function killAWorker() {
-  const workerIds = Object.keys(global.sessions);
-
-  var lowestN = 0;
-  var workerIdToKill = 0;
-
-  for (const workerId of workerIds) {
-    const courseN = global.sessions[workerId].courseN;
-
-    if (courseN < lowestN) {
-      lowestN = courseN;
-      workerIdToKill = workerId;
-    }
-  }
-  // console.log(
-  //   `worker: ${workerIdToKill}` +
-  //     JSON.stringify(global.sessions[workerIdToKill])
-  // );
-  console.log(`Killing worker #${workerIdToKill}.`);
-
-  global.sessions[workerIdToKill].shouldCancel = true;
 }
 
 main();

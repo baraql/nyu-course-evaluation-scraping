@@ -23,7 +23,7 @@ function copyChromeWorkerData(workerId) {
 async function wipeChromeWorkerData() {
   try {
     await fse.emptyDir("./cache/worker-chrome-data");
-    console.log("Directory contents successfully wiped.");
+    logMessage("Directory contents successfully wiped.");
   } catch (err) {
     console.error("An error occurred while wiping directory contents:", err);
   }
