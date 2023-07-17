@@ -58,8 +58,12 @@ async function waitForLogin(page) {
     .then(() => {
       loggedIn = false;
     });
-
-  await Promise.race([waitForURL1, waitForURL2]);
+  try {
+    await Promise.race([waitForURL1, waitForURL2]);
+  } catch (error) {
+    console.log(error);
+    console.trace();
+  }
   return loggedIn;
 }
 

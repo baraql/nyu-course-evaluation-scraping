@@ -42,11 +42,13 @@ function killAWorker() {
 function killWorker(id) {
   // global.sessions[id].shouldCancel = true;
   try {
-    global.browsers[id].close();
-
-    delete global.browsers[id];
-    delete global.sessions[id];
-
+    if (global.browsers[id]) {
+      global.browsers[id].close();
+      delete global.browsers[id];
+    }
+    if (global.sessions[id]) {
+      delete global.sessions[id];
+    }
     if (Object.keys(global.sessions).length == 0) {
       giveMeANewWorker();
     }

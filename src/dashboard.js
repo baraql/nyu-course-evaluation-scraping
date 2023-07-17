@@ -21,6 +21,9 @@ function startDashboard() {
   screen.key(["C-s"], (ch, key) => {
     giveMeANewWorker();
   });
+  screen.key(["C-x"], (ch, key) => {
+    log.clearItems();
+  });
 
   screen.render();
 }
@@ -53,15 +56,9 @@ const box = blessed.box({
   height: "100%",
   content: "Starting up...",
   tags: true,
+  label: "Dashboard",
   border: {
     type: "line",
-  },
-  style: {
-    fg: "white",
-    bg: "blue",
-    border: {
-      fg: "white",
-    },
   },
 });
 
@@ -75,7 +72,7 @@ function updateSessionVariables(freeMem, totalMem) {
       totalMem
     )}.\nBrowsers: ${
       Object.keys(global.browsers).length
-    }.\nctrl-s => start worker\nctrl-k => kill worker\nctrl-c => exit\n`;
+    }.\nctrl-s => start worker\nctrl-k => kill worker\nctrl-x => clear console\nctrl-c => exit\n`;
     const workerStatuses = workerIds.map((key) => {
       const s = global.sessions[key];
       if (s) {
